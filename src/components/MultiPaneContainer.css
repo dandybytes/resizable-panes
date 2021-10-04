@@ -1,0 +1,24 @@
+.splittable-container {
+  display: flex;
+}
+
+.resizable-pane {
+  margin: 0;
+  padding: 1rem;
+  background: white;
+  border: 1px solid #e5e5e5;
+}
+
+.divider {
+  position: relative;
+  width: 0.25rem;
+  flex-shrink: 0;
+  background: transparent;
+  cursor: col-resize;
+  user-select: none;
+
+}
+
+.divider:hover{
+  background: #e4e4e4;
+}
