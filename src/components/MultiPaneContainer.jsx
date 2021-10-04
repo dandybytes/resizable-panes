@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useReducer, useRef} from 'react'
+import React, {useCallback, useEffect, useMemo, useReducer, useRef} from 'react'
 
 import './MultiPaneContainer.css'
 
@@ -8,13 +8,16 @@ const MultiPaneContainer = ({children}) => {
   const containerRef = useRef(null)
 
   const numChildren = children?.length ?? 0
-  const initialState = {
-    isDragging: false,
-    currentPaneIndex: 0,
-    initialPosition: null,
-    dividerPositionDelta: 0,
-    paneSizes: !numChildren ? [] : Array(numChildren ?? 0).fill(`${100 / numChildren}%`)
-  }
+  const initialState = useMemo(
+    () => ({
+      isDragging: false,
+      currentPaneIndex: 0,
+      initialPosition: null,
+      dividerPositionDelta: 0,
+      paneSizes: !numChildren ? [] : Array(numChildren ?? 0).fill(`${100 / numChildren}%`)
+    }),
+    [numChildren]
+  )
 
   const [state, dispatch] = useReducer(paneReducer, initialState)
   const {isDragging, currentPaneIndex, initialPosition, dividerPositionDelta, paneSizes} = state
