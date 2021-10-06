@@ -36,7 +36,9 @@ const Divider = ({orientation, index, maxSpaceBefore, maxSpaceAfter}) => {
         })
       }
       style={style}
-      className={`divider ${getDividerStatus()}`}
+      className={`divider ${
+        orientation === 'row' ? 'vertical' : 'horizontal'
+      } ${getDividerStatus()}`}
     />
   )
 }
