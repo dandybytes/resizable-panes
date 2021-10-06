@@ -1,55 +1,29 @@
-import React, {useCallback, useEffect, useReducer, useRef} from 'react'
+import React, {useEffect, useContext, useRef} from 'react'
 
 import './MultiPaneContainer.css'
 
-import paneReducer, {initialState} from '../reducers/paneReducer'
 import {useElementSize} from '../hooks/useElementSize'
 
 import ResizablePane from './ResizablePane'
 import Divider from './Divider'
+import {PaneContext} from '../context'
 
 const MultiPaneContainer = ({orientation = 'row', minPaneSize = 200, children}) => {
+  // console.log('main pane container running')
   const containerRef = useRef(null)
+
+  const {paneSizes, updateSizes, handleDragEnd, updateDividerPosition} = useContext(PaneContext)
 
   const containerSize = useElementSize(containerRef)
 
   const numChildren = children?.length ?? 0
-
-  const [state, dispatch] = useReducer(paneReducer, initialState)
-  const {isDragging, indexSelectedPane, initialPosition, dividerPositionDelta, paneSizes} = state
-
-  const handleDragStart = useCallback(
-    ({indexSelectedPane, initialPosition, maxSpaceBefore, maxSpaceAfter}) => {
-      dispatch({
-        type: 'startDrag',
-        payload: {indexSelectedPane, initialPosition, maxSpaceBefore, maxSpaceAfter}
-      })
-    },
-    [dispatch]
-  )
-
-  const handleDragEnd = useCallback(() => {
-    if (!isDragging) return
-    dispatch({type: 'endDrag'})
-  }, [dispatch, isDragging])
-
-  const updateDividerPosition = useCallback(
-    event => {
-      if (!isDragging) return
-      dispatch({
-        type: 'updateDividerPosition',
-        payload: {dividerPositionDelta: event.clientX - initialPosition}
-      })
-    },
-    [dispatch, initialPosition, isDragging]
-  )
 
   // add event listeners
   useEffect(() => {
     const container = containerRef.current
 
     if (container) {
-      console.log('adding event listeners')
+      // console.log('adding event listeners')
       container.addEventListener('mousemove', updateDividerPosition)
       container.addEventListener('mouseup', handleDragEnd)
       container.addEventListener('mouseleave', handleDragEnd)
@@ -64,23 +38,20 @@ const MultiPaneContainer = ({orientation = 'row', minPaneSize = 200, children}) 
 
   // adjust pane sizes whenever the container resizes
   useEffect(() => {
-    let newPaneSizes = []
+    let newPaneSizes = paneSizes
+    // if pane sizes not set yet, do so
     if (!paneSizes?.length && containerSize?.width) {
       const averageSize = parseInt(containerSize?.width / numChildren)
       newPaneSizes = Array(numChildren ?? 0).fill(averageSize)
+      // update pane sizes when the container resizes
     } else if (containerSize?.width) {
       const previousTotalWidth = paneSizes.reduce((acc, paneSize) => acc + paneSize, 0)
       newPaneSizes = paneSizes.map(previousPaneSize =>
         parseInt((containerSize.width * previousPaneSize) / previousTotalWidth)
       )
-    } else {
-      newPaneSizes = paneSizes
     }
 
-    dispatch({
-      type: 'updatePaneSizes',
-      payload: {paneSizes: newPaneSizes}
-    })
+    updateSizes(newPaneSizes)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [numChildren, containerSize?.width])
 
@@ -93,7 +64,6 @@ const MultiPaneContainer = ({orientation = 'row', minPaneSize = 200, children}) 
       {!paneSizes?.length
         ? null
         : children.map((child, index) => {
-            const isSelected = indexSelectedPane === index
             const maxSpaceBefore = paneSizes[index - 1] - minPaneSize
             const maxSpaceAfter = paneSizes[index] - minPaneSize
 
@@ -103,12 +73,8 @@ const MultiPaneContainer = ({orientation = 'row', minPaneSize = 200, children}) 
                   key={`divider-${index}`}
                   orientation={orientation}
                   index={index}
-                  isSelected={isSelected}
-                  isDragging={isDragging}
-                  dividerPositionDelta={dividerPositionDelta}
                   maxSpaceBefore={maxSpaceBefore}
                   maxSpaceAfter={maxSpaceAfter}
-                  handleDragStart={handleDragStart}
                 />,
                 <ResizablePane
                   key={`pane-${index}`}
