@@ -1,0 +1,24 @@
+.divider {
+  position: relative;
+  width: 0.25rem;
+  flex-shrink: 0;
+  background-color: transparent;
+  cursor: col-resize;
+  user-select: none;
+}
+
+.divider:hover{
+  background-color: #e4e4e4;
+}
+
+.divider.idle {
+  transition: all 0.3s ease-in-out;
+}
+
+.divider.valid {
+  background-color: green;
+}
+
+.divider.invalid {
+  background-color: firebrick;
+}

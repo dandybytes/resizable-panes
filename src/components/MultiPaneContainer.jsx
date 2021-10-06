@@ -6,6 +6,7 @@ import paneReducer, {initialState} from '../reducers/paneReducer'
 import {useElementSize} from '../hooks/useElementSize'
 
 import ResizablePane from './ResizablePane'
+import Divider from './Divider'
 
 const MultiPaneContainer = ({minPaneSize = 200, children}) => {
   const containerRef = useRef(null)
@@ -92,32 +93,18 @@ const MultiPaneContainer = ({minPaneSize = 200, children}) => {
             const maxSpaceBefore = paneSizes[index - 1] - minPaneSize
             const maxSpaceAfter = paneSizes[index] - minPaneSize
 
-            const getDividerStatus = () => {
-              if (!isSelected || !isDragging || dividerPositionDelta === 0) return 'idle'
-              const isOutsideBoundaries =
-                dividerPositionDelta < -maxSpaceBefore || dividerPositionDelta > maxSpaceAfter
-              return isOutsideBoundaries ? 'invalid' : 'valid'
-            }
-
-            const divider = (
-              <div
-                onMouseDown={event =>
-                  handleDragStart({
-                    indexSelectedPane: index,
-                    initialPosition: event.clientX,
-                    maxSpaceBefore,
-                    maxSpaceAfter
-                  })
-                }
-                key={`divider-${index}`}
-                style={isSelected ? {left: dividerPositionDelta} : {}}
-                className={`divider ${getDividerStatus()}`}
-              />
-            )
-
             return index > 0 ? (
               [
-                divider,
+                <Divider
+                  key={`divider-${index}`}
+                  index={index}
+                  isSelected={isSelected}
+                  isDragging={isDragging}
+                  dividerPositionDelta={dividerPositionDelta}
+                  maxSpaceBefore={maxSpaceBefore}
+                  maxSpaceAfter={maxSpaceAfter}
+                  handleDragStart={handleDragStart}
+                />,
                 <ResizablePane key={`pane-${index}`} paneSize={paneSizes[index]} child={child} />
               ]
             ) : (
