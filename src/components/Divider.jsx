@@ -3,6 +3,7 @@ import React from 'react'
 import './Divider.css'
 
 const Divider = ({
+  orientation,
   index,
   isSelected,
   isDragging,
@@ -20,7 +21,9 @@ const Divider = ({
 
   const style = {
     left: isSelected ? dividerPositionDelta : 0,
-    display: index > 0 ? 'block' : 'none'
+    display: index > 0 ? 'block' : 'none',
+    width: orientation === 'row' ? '0.25rem' : '100%',
+    height: orientation === 'column' ? '0.25rem' : 'inherit'
   }
 
   return (

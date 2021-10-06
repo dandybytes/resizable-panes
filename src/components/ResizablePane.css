@@ -1,6 +1,7 @@
 .resizable-pane {
+  flex-grow: 1;
+  flex-shrink: 1;
   margin: 0;
-  padding: 1rem;
   background-color: white;
   border: 1px solid #e5e5e5;
   overflow: hidden;

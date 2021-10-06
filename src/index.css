@@ -1,6 +1,7 @@
 html {
   background: white;
   font-family: sans-serif;
+  box-sizing: border-box;
 }
 
 body {

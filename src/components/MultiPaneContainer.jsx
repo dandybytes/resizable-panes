@@ -8,7 +8,7 @@ import {useElementSize} from '../hooks/useElementSize'
 import ResizablePane from './ResizablePane'
 import Divider from './Divider'
 
-const MultiPaneContainer = ({minPaneSize = 200, children}) => {
+const MultiPaneContainer = ({orientation = 'row', minPaneSize = 200, children}) => {
   const containerRef = useRef(null)
 
   const containerSize = useElementSize(containerRef)
@@ -85,7 +85,11 @@ const MultiPaneContainer = ({minPaneSize = 200, children}) => {
   }, [numChildren, containerSize?.width])
 
   return (
-    <div className='splittable-container' ref={containerRef}>
+    <div
+      className='splittable-container'
+      ref={containerRef}
+      style={{display: 'flex', flexDirection: orientation === 'column' ? 'column' : 'row'}}
+    >
       {!paneSizes?.length
         ? null
         : children.map((child, index) => {
@@ -97,6 +101,7 @@ const MultiPaneContainer = ({minPaneSize = 200, children}) => {
               [
                 <Divider
                   key={`divider-${index}`}
+                  orientation={orientation}
                   index={index}
                   isSelected={isSelected}
                   isDragging={isDragging}
@@ -105,10 +110,20 @@ const MultiPaneContainer = ({minPaneSize = 200, children}) => {
                   maxSpaceAfter={maxSpaceAfter}
                   handleDragStart={handleDragStart}
                 />,
-                <ResizablePane key={`pane-${index}`} paneSize={paneSizes[index]} child={child} />
+                <ResizablePane
+                  key={`pane-${index}`}
+                  size={paneSizes[index]}
+                  orientation={orientation}
+                  child={child}
+                />
               ]
             ) : (
-              <ResizablePane key={`pane-${index}`} paneSize={paneSizes[index]} child={child} />
+              <ResizablePane
+                key={`pane-${index}`}
+                size={paneSizes[index]}
+                orientation={orientation}
+                child={child}
+              />
             )
           })}
     </div>
