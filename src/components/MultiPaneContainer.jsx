@@ -5,6 +5,8 @@ import './MultiPaneContainer.css'
 import paneReducer, {initialState} from '../reducers/paneReducer'
 import {useElementSize} from '../hooks/useElementSize'
 
+import ResizablePane from './ResizablePane'
+
 const MultiPaneContainer = ({minPaneSize = 200, children}) => {
   const containerRef = useRef(null)
 
@@ -113,17 +115,14 @@ const MultiPaneContainer = ({minPaneSize = 200, children}) => {
               />
             )
 
-            const pane = (
-              <div
-                key={`pane-${index}`}
-                className='resizable-pane'
-                style={{width: `${paneSizes[index]}px`}}
-              >
-                {child}
-              </div>
+            return index > 0 ? (
+              [
+                divider,
+                <ResizablePane key={`pane-${index}`} paneSize={paneSizes[index]} child={child} />
+              ]
+            ) : (
+              <ResizablePane key={`pane-${index}`} paneSize={paneSizes[index]} child={child} />
             )
-
-            return index > 0 ? [divider, pane] : pane
           })}
     </div>
   )
