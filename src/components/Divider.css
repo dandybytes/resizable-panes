@@ -2,7 +2,8 @@
   position: relative;
   width: 0.25rem;
   flex-shrink: 0;
-  background-color: transparent;
+  /* background-color: transparent; */
+  background-color: #eee;
   cursor: col-resize;
   user-select: none;
 }
@@ -12,7 +13,7 @@
 }
 
 .divider.idle {
-  transition: all 0.3s ease-in-out;
+  /* transition: all 0.3s ease-in-out; */
 }
 
 .divider.valid {
