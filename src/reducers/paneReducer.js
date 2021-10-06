@@ -1,31 +1,68 @@
+export const initialState = {
+  isDragging: false,
+  indexSelectedPane: null,
+  initialPosition: null,
+  dividerPositionDelta: 0,
+  maxSpaceBefore: 0,
+  maxSpaceAfter: 0,
+  paneSizes: []
+}
+
 const paneReducer = (state, {type, payload}) => {
   switch (type) {
-    case 'startDragging': {
-      const {currentPaneIndex, initialPosition} = payload
-      const newState = {...state, isDragging: true, currentPaneIndex, initialPosition}
-      console.log(`startDragging new state:`)
-      console.dir(newState)
+    case 'startDrag': {
+      console.log(`startDrag`)
+      const {indexSelectedPane, initialPosition, maxSpaceBefore, maxSpaceAfter} = payload
+      const newState = {
+        ...state,
+        isDragging: true,
+        indexSelectedPane,
+        initialPosition,
+        maxSpaceBefore,
+        maxSpaceAfter
+      }
       return newState
     }
 
-    case 'endDragging': {
-      console.log('endDragging')
-      const {currentPaneIndex, dividerPositionDelta, paneSizes} = state
-      const newSizes = [...paneSizes]
-      newSizes[
-        currentPaneIndex
-      ] = `calc(${paneSizes[currentPaneIndex]} - ${dividerPositionDelta}px)`
-      newSizes[currentPaneIndex - 1] = `calc(${
-        paneSizes[currentPaneIndex - 1]
-      } + ${dividerPositionDelta}px)`
+    case 'endDrag': {
+      console.log('endDrag')
+      const {
+        isDragging,
+        indexSelectedPane,
+        initialPosition,
+        dividerPositionDelta,
+        maxSpaceBefore,
+        maxSpaceAfter,
+        paneSizes
+      } = state
 
-      return {
-        ...state,
-        isDragging: false,
-        dividerPositionDelta: 0,
-        currentPaneIndex: null,
-        paneSizes: newSizes
-      }
+      // if not in valid dragging process, return the same state
+      if (
+        !isDragging ||
+        indexSelectedPane == null ||
+        initialPosition == null ||
+        dividerPositionDelta === 0 ||
+        maxSpaceBefore === 0 ||
+        maxSpaceAfter === 0
+      )
+        return state
+
+      // if dropping divider outside allowed boundaries, clear all values except pane sizes
+      if (dividerPositionDelta < -maxSpaceBefore || dividerPositionDelta > maxSpaceAfter)
+        return {...initialState, paneSizes}
+
+      // otherwise, update pane sizes according to divider position and clear all other values
+      const newSizes = [...paneSizes]
+      newSizes[indexSelectedPane] = paneSizes[indexSelectedPane] - dividerPositionDelta
+      newSizes[indexSelectedPane - 1] = paneSizes[indexSelectedPane - 1] + dividerPositionDelta
+
+      return {...initialState, paneSizes: newSizes}
+    }
+
+    case 'updatePaneSizes': {
+      console.log('updatePaneSizes')
+      const {paneSizes} = payload
+      return {...state, paneSizes}
     }
 
     case 'updateDividerPosition': {
@@ -35,6 +72,7 @@ const paneReducer = (state, {type, payload}) => {
     }
 
     default:
+      console.error('unkown type: ', type)
       return state
   }
 }
