@@ -17,6 +17,9 @@ const Divider = ({orientation, index, maxSpaceBefore, maxSpaceAfter}) => {
     return isOutsideBoundaries ? 'invalid' : 'valid'
   }
 
+  const className =
+    'divider' + (orientation === 'row' ? ' vertical ' : ' horizontal ') + getDividerStatus()
+
   const style = {
     left: isSelected ? displacement : 0,
     display: index > 0 ? 'block' : 'none',
@@ -36,9 +39,7 @@ const Divider = ({orientation, index, maxSpaceBefore, maxSpaceAfter}) => {
         })
       }
       style={style}
-      className={`divider ${
-        orientation === 'row' ? 'vertical' : 'horizontal'
-      } ${getDividerStatus()}`}
+      className={className}
     />
   )
 }

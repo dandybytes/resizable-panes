@@ -1,8 +1,8 @@
 import React from 'react'
 
-import './ResizablePane.css'
+import './Pane.css'
 
-const ResizablePane = ({size, orientation, child}) => {
+const Pane = ({size, orientation, child}) => {
   const style = {
     width: orientation === 'row' ? `${size}px` : '100%',
     flexDirection: orientation === 'column' ? 'column' : 'row'
@@ -15,4 +15,4 @@ const ResizablePane = ({size, orientation, child}) => {
   )
 }
 
-export default ResizablePane
+export default Pane

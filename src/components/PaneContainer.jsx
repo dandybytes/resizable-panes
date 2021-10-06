@@ -1,18 +1,19 @@
 import React, {useEffect, useContext, useRef} from 'react'
 
-import './MultiPaneContainer.css'
+import './PaneContainer.css'
 
 import {useElementSize} from '../hooks/useElementSize'
 
-import ResizablePane from './ResizablePane'
+import Pane from './Pane'
 import Divider from './Divider'
 import {PaneContext} from '../context'
 
-const MultiPaneContainer = ({orientation = 'row', minPaneSize = 200, children}) => {
+const PaneContainer = ({children}) => {
   // console.log('main pane container running')
   const containerRef = useRef(null)
 
-  const {paneSizes, updateSizes, handleDragEnd, updateDividerPosition} = useContext(PaneContext)
+  const {orientation, minPaneSize, paneSizes, updateSizes, handleDragEnd, updateDividerPosition} =
+    useContext(PaneContext)
 
   const containerSize = useElementSize(containerRef)
 
@@ -76,7 +77,7 @@ const MultiPaneContainer = ({orientation = 'row', minPaneSize = 200, children}) 
                   maxSpaceBefore={maxSpaceBefore}
                   maxSpaceAfter={maxSpaceAfter}
                 />,
-                <ResizablePane
+                <Pane
                   key={`pane-${index}`}
                   size={paneSizes[index]}
                   orientation={orientation}
@@ -84,7 +85,7 @@ const MultiPaneContainer = ({orientation = 'row', minPaneSize = 200, children}) 
                 />
               ]
             ) : (
-              <ResizablePane
+              <Pane
                 key={`pane-${index}`}
                 size={paneSizes[index]}
                 orientation={orientation}
@@ -96,4 +97,4 @@ const MultiPaneContainer = ({orientation = 'row', minPaneSize = 200, children}) 
   )
 }
 
-export default MultiPaneContainer
+export default PaneContainer
