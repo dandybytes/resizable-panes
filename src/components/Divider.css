@@ -4,8 +4,15 @@
   flex-grow: 0;
   /* background-color: transparent; */
   background-color: #efefef;
-  cursor: col-resize;
   user-select: none;
+}
+
+.divider.horizontal {
+  cursor: row-resize;
+}
+
+.divider.vertical {
+  cursor: col-resize;
 }
 
 .divider:hover{

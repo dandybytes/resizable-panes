@@ -14,7 +14,7 @@
 	 display: none;
 }
  .switch-checkbox:checked + .switch-slider {
-	 background-color: firebrick;
+	 background-color: green;
 }
  .switch-checkbox:checked + .switch-slider:before {
 	 transform: translateX(1.5rem);
