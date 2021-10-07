@@ -4,7 +4,7 @@ import {MainProvider} from '../context'
 
 import PaneContainer from './PaneContainer'
 
-const ResizablePanes = ({orientation, minPaneSize = 200, children}) => {
+const ResizablePanes = ({orientation, minPaneSize = 50, children}) => {
   return (
     <MainProvider orientation={orientation} minPaneSize={minPaneSize}>
       <PaneContainer>{children}</PaneContainer>

@@ -8,8 +8,6 @@ export const MainProvider = ({orientation, minPaneSize, children}) => {
   const [state, dispatch] = useReducer(paneReducer, initialState)
   const {indexSelectedPane, initialDividerPosition, currentDividerPosition, paneSizes} = state
 
-  // console.log('root provider update')
-
   const handleDragStart = useCallback(
     ({
       indexSelectedPane,
@@ -42,10 +40,10 @@ export const MainProvider = ({orientation, minPaneSize, children}) => {
       if (indexSelectedPane == null) return
       dispatch({
         type: 'updateDividerPosition',
-        payload: {currentDividerPosition: event.clientX}
+        payload: {currentDividerPosition: orientation === 'column' ? event.clientY : event.clientX}
       })
     },
-    [dispatch, indexSelectedPane]
+    [orientation, dispatch, indexSelectedPane]
   )
 
   const updateSizes = useCallback(
@@ -72,12 +70,19 @@ export const MainProvider = ({orientation, minPaneSize, children}) => {
 
   const dividerContext = useMemo(
     () => ({
+      orientation,
       indexSelectedPane,
       initialDividerPosition,
       currentDividerPosition,
       handleDragStart
     }),
-    [indexSelectedPane, initialDividerPosition, currentDividerPosition, handleDragStart]
+    [
+      orientation,
+      indexSelectedPane,
+      initialDividerPosition,
+      currentDividerPosition,
+      handleDragStart
+    ]
   )
 
   return (

@@ -4,9 +4,14 @@ import {DividerContext} from '../context'
 
 import './Divider.css'
 
-const Divider = ({orientation, index, maxSpaceBefore, maxSpaceAfter}) => {
-  const {indexSelectedPane, initialDividerPosition, currentDividerPosition, handleDragStart} =
-    useContext(DividerContext)
+const Divider = ({index, maxSpaceBefore, maxSpaceAfter}) => {
+  const {
+    orientation,
+    indexSelectedPane,
+    initialDividerPosition,
+    currentDividerPosition,
+    handleDragStart
+  } = useContext(DividerContext)
 
   const isSelected = indexSelectedPane === index
   const displacement = currentDividerPosition - initialDividerPosition
@@ -21,7 +26,8 @@ const Divider = ({orientation, index, maxSpaceBefore, maxSpaceAfter}) => {
     'divider' + (orientation === 'row' ? ' vertical ' : ' horizontal ') + getDividerStatus()
 
   const style = {
-    left: isSelected ? displacement : 0,
+    left: isSelected && orientation === 'row' ? displacement : 0,
+    top: isSelected && orientation === 'column' ? displacement : 0,
     display: index > 0 ? 'block' : 'none',
     width: orientation === 'row' ? '0.25rem' : '100%',
     height: orientation === 'column' ? '0.25rem' : 'inherit'
@@ -29,15 +35,16 @@ const Divider = ({orientation, index, maxSpaceBefore, maxSpaceAfter}) => {
 
   return (
     <div
-      onMouseDown={event =>
+      onMouseDown={event => {
+        const position = orientation === 'column' ? event.clientY : event.clientX
         handleDragStart({
           indexSelectedPane: index,
-          initialDividerPosition: event.clientX,
-          currentDividerPosition: event.clientX,
+          initialDividerPosition: position,
+          currentDividerPosition: position,
           maxSpaceBefore,
           maxSpaceAfter
         })
-      }
+      }}
       style={style}
       className={className}
     />

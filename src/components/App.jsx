@@ -6,7 +6,7 @@ import ToggleSwitch from './common/ToggleSwitch'
 import ResizablePanes from './ResizablePanes'
 
 const Application = () => {
-  const [isRow, setIsRow] = useState(true)
+  const [isRow, setIsRow] = useState(false)
 
   return (
     <>
@@ -18,11 +18,15 @@ const Application = () => {
         onToggle={() => setIsRow(prevValue => !prevValue)}
       />
 
-      <ResizablePanes orientation={isRow ? 'row' : 'column'}>
-        <div className='sample-content'>first pane</div>
-        <div className='sample-content'>second pane</div>
-        <div className='sample-content'>third pane</div>
-      </ResizablePanes>
+      <div style={{height: '75vh', width: '100vw', display: 'flex'}}>
+        <ResizablePanes orientation={isRow ? 'row' : 'column'} minPaneSize={100}>
+          {Array.from({length: 3}, (v, i) => i + 1).map(x => (
+            <div className='sample-content' key={`sample-content-${x}`}>
+              pane {x}
+            </div>
+          ))}
+        </ResizablePanes>
+      </div>
     </>
   )
 }

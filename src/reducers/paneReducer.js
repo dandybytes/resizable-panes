@@ -10,7 +10,6 @@ export const initialState = {
 const paneReducer = (state, {type, payload}) => {
   switch (type) {
     case 'startDrag': {
-      // console.log(`startDrag`)
       const {
         indexSelectedPane,
         initialDividerPosition,
@@ -30,7 +29,6 @@ const paneReducer = (state, {type, payload}) => {
     }
 
     case 'endDrag': {
-      // console.log('endDrag')
       const {
         indexSelectedPane,
         initialDividerPosition,
@@ -65,13 +63,11 @@ const paneReducer = (state, {type, payload}) => {
     }
 
     case 'updatePaneSizes': {
-      // console.log('updatePaneSizes')
       const {paneSizes} = payload
       return {...state, paneSizes}
     }
 
     case 'updateDividerPosition': {
-      // console.log('updateDividerPosition')
       const {currentDividerPosition} = payload
       return {...state, currentDividerPosition}
     }
