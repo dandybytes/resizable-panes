@@ -1,27 +1,34 @@
 import React, {useEffect, useContext, useRef} from 'react'
 
-import './PaneContainer.css'
+import {getValidChildren} from '../../../../utils/react'
+import {useElementSize} from '../../../../hooks/useElementSize'
 
+import './PaneContainer.css'
 import {PaneContext} from '../context'
-import {useElementSize} from '../hooks/useElementSize'
 
 import Pane from './Pane'
-import Divider from './Divider'
+import PaneDivider from './PaneDivider'
 
-const PaneContainer = ({children}) => {
-  const containerRef = useRef(null)
+type PaneContainerProps = {
+  style?: React.CSSProperties
+  children: React.ReactNode | React.ReactNode[]
+}
+
+const PaneContainer = ({style = {}, children}: PaneContainerProps): JSX.Element => {
+  const containerRef = useRef<HTMLDivElement>(null)
 
   const {orientation, minPaneSize, paneSizes, updateSizes, handleDragEnd, updateDividerPosition} =
     useContext(PaneContext)
 
+  const renderableChildren = getValidChildren(children)
+  const numChildren = renderableChildren?.length
   const relevantSize = orientation === 'row' ? 'width' : 'height'
 
   const containerSize = useElementSize(containerRef)
 
   const previousOrientationRef = useRef(orientation)
-  const previousContainerSizeRef = useRef(containerSize?.[relevantSize])
-
-  const numChildren = children?.length ?? 0
+  const previousContainerSizeRef = useRef(containerSize)
+  const previousNumChildrenRef = useRef(numChildren)
 
   // add event listeners
   useEffect(() => {
@@ -45,62 +52,69 @@ const PaneContainer = ({children}) => {
     if (!currentContainerSize) return
 
     const orientationHasChanged = previousOrientationRef.current !== orientation
-    const previousContainerSize = previousContainerSizeRef?.[relevantSize]
+    const previousContainerSize = previousContainerSizeRef.current?.[relevantSize]
     const containerSizeHasChanged =
       previousContainerSize != null && previousContainerSize !== currentContainerSize
+    const numChildrenHasChanged = previousNumChildrenRef.current !== numChildren
 
-    // divide container size into equal parts among all panes when first loading and whenever orientation changes
-    if (!paneSizes?.length || orientationHasChanged) {
-      const averageSize = parseInt(currentContainerSize / numChildren)
+    // divide container size into equal parts among all panes when first loading as well as whenever orientation or the number of children changes
+    if (!paneSizes?.length || orientationHasChanged || numChildrenHasChanged) {
+      const averageSize = Math.floor(currentContainerSize / numChildren)
       const newPaneSizes = Array(numChildren ?? 0).fill(averageSize)
       updateSizes(newPaneSizes)
       // adjust pane sizes whenever the container resizes
     } else if (containerSizeHasChanged && !orientationHasChanged) {
       const previousTotalWidth = paneSizes.reduce((acc, paneSize) => acc + paneSize, 0)
       const newPaneSizes = paneSizes.map(previousPaneSize =>
-        parseInt((currentContainerSize * previousPaneSize) / previousTotalWidth)
+        Math.floor((currentContainerSize * previousPaneSize) / previousTotalWidth)
       )
       updateSizes(newPaneSizes)
     }
 
     if (orientationHasChanged) previousOrientationRef.current = orientation
     if (containerSizeHasChanged) previousContainerSizeRef.current = containerSize
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orientation, containerSize, numChildren, updateSizes, paneSizes.length])
+    if (numChildrenHasChanged) previousNumChildrenRef.current = numChildren
+  }, [orientation, containerSize, numChildren, updateSizes])
 
   return (
     <div
       className='splittable-container'
       ref={containerRef}
-      style={{display: 'flex', flexDirection: orientation === 'column' ? 'column' : 'row'}}
+      style={{
+        ...style,
+        display: 'flex',
+        flexDirection: orientation === 'column' ? 'column' : 'row'
+      }}
     >
-      {!paneSizes?.length
-        ? null
-        : children.map((child, index) =>
-            index > 0 ? (
-              [
-                <Divider
-                  key={`divider-${index}`}
-                  index={index}
-                  maxSpaceBefore={paneSizes[index - 1] - minPaneSize}
-                  maxSpaceAfter={paneSizes[index] - minPaneSize}
-                />,
-                <Pane
-                  key={`pane-${index}`}
-                  size={paneSizes[index]}
-                  orientation={orientation}
-                  child={child}
-                />
-              ]
-            ) : (
+      {!paneSizes?.length ? (
+        <p>loading...</p>
+      ) : (
+        renderableChildren.map((child, index) =>
+          index > 0 ? (
+            [
+              <PaneDivider
+                key={`divider-${index}`}
+                index={index}
+                maxSpaceBefore={paneSizes[index - 1] - minPaneSize}
+                maxSpaceAfter={paneSizes[index] - minPaneSize}
+              />,
               <Pane
                 key={`pane-${index}`}
                 size={paneSizes[index]}
                 orientation={orientation}
                 child={child}
               />
-            )
-          )}
+            ]
+          ) : (
+            <Pane
+              key={`pane-${index}`}
+              size={paneSizes[index]}
+              orientation={orientation}
+              child={child}
+            />
+          )
+        )
+      )}
     </div>
   )
 }

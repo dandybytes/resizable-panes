@@ -1,9 +1,16 @@
-import React from 'react'
-import PropTypes from 'prop-types'
+import React, {FC} from 'react'
 
 import './ToggleSwitch.css'
 
-const ToggleSwitch = ({enabled, classes, onToggle, label, value}) => {
+type TSProps = {
+  enabled: boolean
+  classes?: string
+  onToggle: () => void
+  label?: string
+  value?: number | string
+}
+
+const ToggleSwitch: FC<TSProps> = ({enabled, classes, onToggle, label, value}) => {
   return (
     <label className={`switch-label ${classes}`}>
       <div className={`switch-container`}>
@@ -21,13 +28,11 @@ const ToggleSwitch = ({enabled, classes, onToggle, label, value}) => {
   )
 }
 
-ToggleSwitch.propTypes = {
-  enabled: PropTypes.bool,
-  classes: PropTypes.string,
-  value: PropTypes.bool.isRequired,
-  onToggle: PropTypes.func.isRequired
-}
-
-ToggleSwitch.defaultProps = {}
+// ToggleSwitch.propTypes = {
+//   enabled: PropTypes.bool,
+//   classes: PropTypes.string,
+//   value: PropTypes.bool.isRequired,
+//   onToggle: PropTypes.func.isRequired
+// }
 
 export default ToggleSwitch

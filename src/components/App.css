@@ -5,6 +5,6 @@
 .sample-content {
   min-height: 15rem;
   min-width: 15rem;
-  display: grid;
-  place-items: center;
+  /* display: grid;
+  place-items: center; */
 }

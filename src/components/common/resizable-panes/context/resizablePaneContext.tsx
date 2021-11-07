@@ -1,10 +1,57 @@
 import React, {createContext, useCallback, useMemo, useReducer} from 'react'
+
 import paneReducer, {initialState} from '../reducers/paneReducer'
+import {ColorPalette as DividerPalette} from '../components/PaneDivider'
 
-export const DividerContext = createContext()
-export const PaneContext = createContext()
+export type OrientationType = 'row' | 'column'
 
-export const MainProvider = ({orientation, minPaneSize, children}) => {
+export type PaneContextType = {
+  orientation: OrientationType
+  minPaneSize: number
+  paneSizes: number[]
+  updateSizes: (newPaneSizes: number[]) => void
+  handleDragEnd: () => void
+  updateDividerPosition: (this: HTMLElement, ev: MouseEvent) => any
+}
+
+export type DividerContextType = {
+  orientation: OrientationType
+  dividerPalette: DividerPalette
+  indexSelectedPane: number
+  initialDividerPosition: number
+  currentDividerPosition: number
+  handleDragStart: ({
+    indexSelectedPane,
+    initialDividerPosition,
+    currentDividerPosition,
+    maxSpaceBefore,
+    maxSpaceAfter
+  }: {
+    indexSelectedPane: number
+    initialDividerPosition: number
+    currentDividerPosition: number
+    maxSpaceBefore: number
+    maxSpaceAfter: number
+  }) => void
+  handleDragEnd: () => void
+}
+
+type ResizablePaneProviderProps = {
+  orientation: OrientationType
+  minPaneSize: number
+  dividerPalette: DividerPalette
+  children: React.ReactNode
+}
+
+export const DividerContext = createContext<DividerContextType>(null)
+export const PaneContext = createContext<PaneContextType>(null)
+
+export const MainProvider: React.FunctionComponent<ResizablePaneProviderProps> = ({
+  orientation,
+  minPaneSize,
+  dividerPalette,
+  children
+}: ResizablePaneProviderProps) => {
   const [state, dispatch] = useReducer(paneReducer, initialState)
   const {indexSelectedPane, initialDividerPosition, currentDividerPosition, paneSizes} = state
 
@@ -31,9 +78,8 @@ export const MainProvider = ({orientation, minPaneSize, children}) => {
   )
 
   const handleDragEnd = useCallback(() => {
-    if (indexSelectedPane == null) return
     dispatch({type: 'endDrag'})
-  }, [dispatch, indexSelectedPane])
+  }, [dispatch])
 
   const updateDividerPosition = useCallback(
     event => {
@@ -71,17 +117,21 @@ export const MainProvider = ({orientation, minPaneSize, children}) => {
   const dividerContext = useMemo(
     () => ({
       orientation,
+      dividerPalette,
       indexSelectedPane,
       initialDividerPosition,
       currentDividerPosition,
-      handleDragStart
+      handleDragStart,
+      handleDragEnd
     }),
     [
       orientation,
+      dividerPalette,
       indexSelectedPane,
       initialDividerPosition,
       currentDividerPosition,
-      handleDragStart
+      handleDragStart,
+      handleDragEnd
     ]
   )
 

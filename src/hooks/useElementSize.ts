@@ -1,10 +1,19 @@
-import {useEffect, useState, useRef} from 'react'
+import {MutableRefObject, useEffect, useState, useRef} from 'react'
 
-export const useElementSize = (elementRef, debounceDuration = 100) => {
+/**
+ * React hook that retrieves the size parameters of an HTML element whose ref is provided
+ * @param elementRef A React ref to the element whose size parameters must be retrieved
+ * @param debounceDuration The number of milliseconds by which size value adjustments must be debounced
+ * @returns A DOMRect object containing width and height among other properties
+ */
+export const useElementSize = <T extends HTMLElement>(
+  elementRef: MutableRefObject<T>,
+  debounceDuration = 100
+): DOMRect | null => {
   const isFirstTimeRef = useRef(true)
-  const timeoutRef = useRef(null)
+  const timeoutRef: MutableRefObject<ReturnType<typeof setTimeout> | null> = useRef(null)
 
-  const [elementSize, setElementSize] = useState(null)
+  const [elementSize, setElementSize] = useState<DOMRect | null>(null)
 
   const observerRef = useRef(
     new ResizeObserver(entries => {
@@ -18,7 +27,7 @@ export const useElementSize = (elementRef, debounceDuration = 100) => {
         return
       }
 
-      if (debounceDuration) {
+      if (debounceDuration && timeoutRef.current != null) {
         clearTimeout(timeoutRef.current)
         timeoutRef.current = setTimeout(() => {
           setElementSize(entries[0]?.contentRect)
